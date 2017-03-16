@@ -8,13 +8,16 @@
     </head>
     <body>
         <div id="graphicPart">
+            <div id="turtle">
+            </div>
         </div>
         <div id="shell">
             <div class="shell-content">
                 <input type="text" autocomplete='off' spellcheck='false' autocorrect='off' id="consoleInput"></input>
             </div>
         </div>
-        <script src="scripts/jquery-3.1.1.min.js"></script>
-        <script src="scripts/logo.js"></script>
+        <script src="./scripts/jquery-3.1.1.min.js"></script>
+        <!-- We use require.js to be able to use module without using a server -->
+        <script data-main="./scripts/logo" src="./require.js"></script>
     </body>
 </html>

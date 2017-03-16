@@ -1,3 +1,8 @@
+import { Commands } from "./commands";
+import { Turtle } from "./turtle";
+
+let commands = new Commands();
+
 export const screen = $("#graphicPart");
 
 $("#consoleInput").change(function(){
@@ -5,7 +10,12 @@ $("#consoleInput").change(function(){
 });
 
 function checkInput(input : string){
-
+    switch(input)
+    {
+        case "move":
+        commands.moveForward(20);
+        break;
+    }
 }
 
 /*let i = 0;
