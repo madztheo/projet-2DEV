@@ -18,7 +18,7 @@ function checkInput(input : string){
     $("#consoleInput").val("");
     let success = commandManager.executeCommand(input);
     if(!success){
-        alert("The command coudln't be executed");
+        alert("The command couldn't be executed");
     }
 }
 

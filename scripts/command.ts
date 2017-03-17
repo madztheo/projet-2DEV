@@ -88,3 +88,225 @@ export class AVCmd extends Command {
         return true;
     }
 }
+
+/**
+ * The RE command to move the turtle backward on the screen
+ */
+export class RECmd extends Command{
+
+    constructor(){
+        super();
+        this.cmdName = "RE";
+        this.expectedArgs = [
+            { name : "position", type : "number" }
+        ];
+    }
+        
+    execute(cmd : string, turtle : Turtle) : boolean{
+        let success = super.execute(cmd, turtle);
+        if(!success){
+            return false;
+        }
+
+        turtle.move(0, this.args[0]);
+        return true;
+    }
+}
+
+/**
+ * The TD command to turn the turtle to the right
+ */
+export class TDCmd extends Command{
+    constructor(){
+        super();
+        this.cmdName = "TD";
+        this.expectedArgs = [
+            { name : "degrees", type : "number" }
+        ];
+    }
+        
+    execute(cmd : string, turtle : Turtle) : boolean{
+        let success = super.execute(cmd, turtle);
+        if(!success){
+            return false;
+        }
+
+        turtle.rotate(this.args[0]);
+        return true;
+    }
+}
+
+/**
+ * The TG command to turn the turtle to the left
+ */
+export class TGCmd extends Command{
+    constructor(){
+        super();
+        this.cmdName = "TG";
+        this.expectedArgs = [
+            { name : "degrees", type : "number" }
+        ];
+    }
+        
+    execute(cmd : string, turtle : Turtle) : boolean{
+        let success = super.execute(cmd, turtle);
+        if(!success){
+            return false;
+        }
+
+        turtle.rotate(-this.args[0]);
+        return true;
+    }
+}
+
+/**
+ * The FCC command to to change the trace's color
+ */
+export class FCCCmd extends Command{
+    constructor(){
+        super();
+        this.cmdName = "FCC";
+        this.expectedArgs = [
+            { name : "color", type : "string" }
+        ];
+    }
+        
+    execute(cmd : string, turtle : Turtle) : boolean{
+        let success = super.execute(cmd, turtle);
+        if(!success){
+            return false;
+        }
+
+        return true;
+    }
+}
+
+
+/**
+ * The LC command to hide the trace
+ */
+export class LCCmd extends Command{
+    constructor(){
+        super();
+        this.cmdName = "LC";
+        this.expectedArgs = [];
+    }
+        
+    execute(cmd : string, turtle : Turtle) : boolean{
+        let success = super.execute(cmd, turtle);
+        if(!success){
+            return false;
+        }
+
+        turtle.setTraceStatus(false);
+        return true;
+    }
+}
+
+/**
+ * The BC command to show the trace
+ */
+export class BCCmd extends Command{
+    constructor(){
+        super();
+        this.cmdName = "BC";
+        this.expectedArgs = [];
+    }
+        
+    execute(cmd : string, turtle : Turtle) : boolean{
+        let success = super.execute(cmd, turtle);
+        if(!success){
+            return false;
+        }
+
+        turtle.setTraceStatus(true);
+        return true;
+    }
+}
+
+/**
+ * The VE command to clear the screen and reset the position of the turtle
+ */
+export class VECmd extends Command{
+    constructor(){
+        super();
+        this.cmdName = "VE";
+        this.expectedArgs = [];
+    }
+        
+    execute(cmd : string, turtle : Turtle) : boolean{
+        let success = super.execute(cmd, turtle);
+        if(!success){
+            return false;
+        }
+
+        turtle.resetTurtle();
+        return true;
+    }
+}
+
+/**
+ * The CT command to hide the turtle
+ */
+export class CTCmd extends Command{
+    constructor(){
+        super();
+        this.cmdName = "CT";
+        this.expectedArgs = [];
+    }
+        
+    execute(cmd : string, turtle : Turtle) : boolean{
+        let success = super.execute(cmd, turtle);
+        if(!success){
+            return false;
+        }
+
+        turtle.setVisibility(false);
+        return true;
+    }
+}
+
+/**
+ * The MT command to show the turtle
+ */
+export class MTCmd extends Command{
+    constructor(){
+        super();
+        this.cmdName = "MT";
+        this.expectedArgs = [];
+    }
+        
+    execute(cmd : string, turtle : Turtle) : boolean{
+        let success = super.execute(cmd, turtle);
+        if(!success){
+            return false;
+        }
+
+        turtle.setVisibility(true);
+        return true;
+    }
+}
+
+/**
+ * The REPETE command to repete another command a certain number of times
+ */
+export class REPETECmd extends Command{
+    constructor(){
+        super();
+        this.cmdName = "REPETE";
+        this.expectedArgs = [
+            { name : "times", type : "number" },
+            { name : "commands", type : "command" }
+        ];;
+    }
+        
+    execute(cmd : string, turtle : Turtle) : boolean{
+        let success = super.execute(cmd, turtle);
+        if(!success){
+            return false;
+        }
+
+
+        return true;
+    }
+}

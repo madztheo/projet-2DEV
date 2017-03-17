@@ -1,5 +1,5 @@
 import { Turtle } from "./turtle";
-import { AVCmd } from "./command";
+import { AVCmd, Command, RECmd, TDCmd, TGCmd } from './command';
 
 export class CommandManager{
     turtle : Turtle;
@@ -20,12 +20,31 @@ export class CommandManager{
 
     executeCommand(cmd : string) : boolean {
         let cmdName = this.getCommandName(cmd);
+        let cmdToExecute : Command;
         switch(cmdName){
             case "AV":
-            let avCmd = new AVCmd();
-            avCmd.execute(cmd, this.turtle);
+            cmdToExecute = new AVCmd();
             break;
+
+            case "RE":
+            cmdToExecute = new RECmd();
+            break;
+
+            case "TD":
+            cmdToExecute = new TDCmd();
+            break;
+
+            case "TG":
+            cmdToExecute = new TGCmd();
+            break;
+            
         }
-        return true;
+        
+        if(cmdToExecute != null){
+            return cmdToExecute.execute(cmd, this.turtle);
+        } else{
+            return false;
+        }
+  
     }
 }

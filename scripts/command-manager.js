@@ -15,13 +15,27 @@ define(["require", "exports", "./turtle", "./command"], function (require, expor
         };
         CommandManager.prototype.executeCommand = function (cmd) {
             var cmdName = this.getCommandName(cmd);
+            var cmdToExecute;
             switch (cmdName) {
                 case "AV":
-                    var avCmd = new command_1.AVCmd();
-                    avCmd.execute(cmd, this.turtle);
+                    cmdToExecute = new command_1.AVCmd();
+                    break;
+                case "RE":
+                    cmdToExecute = new command_1.RECmd();
+                    break;
+                case "TD":
+                    cmdToExecute = new command_1.TDCmd();
+                    break;
+                case "TG":
+                    cmdToExecute = new command_1.TGCmd();
                     break;
             }
-            return true;
+            if (cmdToExecute != null) {
+                return cmdToExecute.execute(cmd, this.turtle);
+            }
+            else {
+                return false;
+            }
         };
         return CommandManager;
     }());

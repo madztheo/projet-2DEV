@@ -13,7 +13,7 @@ define(["require", "exports", "./command-manager"], function (require, exports, 
         $("#consoleInput").val("");
         var success = commandManager.executeCommand(input);
         if (!success) {
-            alert("The command coudln't be executed");
+            alert("The command couldn't be executed");
         }
     }
     function updateCommandHistory(cmd) {
