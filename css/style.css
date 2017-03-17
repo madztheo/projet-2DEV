@@ -46,7 +46,22 @@ body
     background-color: transparent;
     color : rgb(0,255,0);
     border : none;
+    padding-top: 10px;
     width : 100%;
+}
+
+#cmdHistoryList{
+    margin: 0;
+    padding : 0;
+    display: none;
+}
+
+#cmdHistoryList li{
+    display: none;
+    list-style-type: none;
+    height: 25px;
+    font-size : 20px;
+    padding-top: 10px;
 }
 
 .shell-content input:focus

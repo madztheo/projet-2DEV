@@ -1,14 +1,14 @@
 define(["require", "exports", "./turtle"], function (require, exports, turtle_1) {
     "use strict";
-    var Commands = (function () {
-        function Commands() {
+    var CommandManager = (function () {
+        function CommandManager() {
             this.turtle = new turtle_1.Turtle();
         }
-        Commands.prototype.moveForward = function (pixels) {
+        CommandManager.prototype.moveForward = function (pixels) {
             this.turtle.move(0, -pixels);
         };
-        return Commands;
+        return CommandManager;
     }());
-    exports.Commands = Commands;
+    exports.CommandManager = CommandManager;
 });
 //# sourceMappingURL=commands.js.map

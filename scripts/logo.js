@@ -1,15 +1,29 @@
-define(["require", "exports", "./commands"], function (require, exports, commands_1) {
+define(["require", "exports", "./command-manager"], function (require, exports, command_manager_1) {
     "use strict";
-    var commands = new commands_1.Commands();
+    var commandManager = new command_manager_1.CommandManager();
+    var commandHistory = [];
     exports.screen = $("#graphicPart");
-    $("#consoleInput").change(function () {
-        checkInput($(this).val());
+    $("#consoleInput").keydown(function (event) {
+        if (event.which == 13) {
+            checkInput($(this).val());
+        }
     });
     function checkInput(input) {
-        switch (input) {
-            case "move":
-                commands.moveForward(20);
-                break;
+        updateCommandHistory(input);
+        $("#consoleInput").val("");
+        var success = commandManager.executeCommand(input);
+        if (!success) {
+            alert("The command coudln't be executed");
+        }
+    }
+    function updateCommandHistory(cmd) {
+        commandHistory.push(cmd);
+        $("#cmdHistoryList").css("display", "block");
+        $("#cmdHistoryList li:nth-child(2)").text(commandHistory[commandHistory.length - 1]);
+        $("#cmdHistoryList li:nth-child(2)").css("display", "block");
+        if (commandHistory.length > 1) {
+            $("#cmdHistoryList li:first").text(commandHistory[commandHistory.length - 2]);
+            $("#cmdHistoryList li:first").css("display", "block");
         }
     }
 });
