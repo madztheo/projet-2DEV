@@ -29,6 +29,24 @@ define(["require", "exports", "./turtle", "./command"], function (require, expor
                 case "TG":
                     cmdToExecute = new command_1.TGCmd();
                     break;
+                case "FCC":
+                    cmdToExecute = new command_1.FCCCmd();
+                    break;
+                case "LC":
+                    cmdToExecute = new command_1.LCCmd();
+                    break;
+                case "BC":
+                    cmdToExecute = new command_1.BCCmd();
+                    break;
+                case "VE":
+                    cmdToExecute = new command_1.VECmd();
+                    break;
+                case "CT":
+                    cmdToExecute = new command_1.CTCmd();
+                    break;
+                case "MT":
+                    cmdToExecute = new command_1.MTCmd();
+                    break;
             }
             if (cmdToExecute != null) {
                 return cmdToExecute.execute(cmd, this.turtle);

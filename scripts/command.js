@@ -170,6 +170,7 @@ define(["require", "exports"], function (require, exports) {
             if (!success) {
                 return false;
             }
+            turtle.setTraceColor(this.args[0]);
             return true;
         };
         return FCCCmd;

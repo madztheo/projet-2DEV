@@ -1,5 +1,5 @@
 import { Turtle } from "./turtle";
-import { AVCmd, Command, RECmd, TDCmd, TGCmd } from './command';
+import { AVCmd, BCCmd, Command, CTCmd, FCCCmd, LCCmd, MTCmd, RECmd, TDCmd, TGCmd, VECmd } from './command';
 
 export class CommandManager{
     turtle : Turtle;
@@ -36,6 +36,30 @@ export class CommandManager{
 
             case "TG":
             cmdToExecute = new TGCmd();
+            break;
+
+            case "FCC":
+            cmdToExecute = new FCCCmd();
+            break;
+
+            case "LC":
+            cmdToExecute = new LCCmd();
+            break;
+
+            case "BC":
+            cmdToExecute = new BCCmd();
+            break;
+
+            case "VE":
+            cmdToExecute = new VECmd();
+            break;
+
+            case "CT":
+            cmdToExecute = new CTCmd();
+            break;
+
+            case "MT":
+            cmdToExecute = new MTCmd();
             break;
             
         }
