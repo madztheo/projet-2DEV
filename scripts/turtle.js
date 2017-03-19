@@ -12,20 +12,23 @@ define(["require", "exports"], function (require, exports) {
         }
         Turtle.prototype.drawTrace = function (oldX, oldY) {
             var trace = $("\n            <div class=\"turtle-trace\">\n            </div>\n        ");
-            var distanceY = oldY - this.y;
-            var distanceX = oldX - this.x;
-            console.log(distanceY);
+            var distance = Math.sqrt(Math.pow(oldX - this.x, 2) + Math.pow(oldY - this.y, 2));
+            var transform = oldX > this.x || oldY > this.y ? "rotate(" + (this.rotation + 90) + "deg) translate(" + (distance + 5) + "px,0)" : "rotate(" + (this.rotation + 90) + "deg) translate(5px,0)";
+            console.log(distance);
             trace.css({
-                "height": distanceY == 0 ? "2px" : Math.abs(distanceY) + "px",
-                "width": distanceX == 0 ? "2px" : Math.abs(distanceX) + "px",
-                'left': this.x + 4 + "px",
-                /*'transform' :  `rotate(${this.rotation}deg)`,
-                '-webkit-transform' :  `rotate(${this.rotation}deg)`,
-                '-ms-transform' :  `rotate(${this.rotation}deg)`,*/
-                'top': distanceY < 0 ? this.y + distanceY + "px" : this.y + 10 + "px",
+                "height": "2px",
+                "width": distance + "px",
+                //We need to compensate as the rotation of the div doesn't change the actual position of it
+                'left': this.x + 5 - distance / 2 - ((distance / 2) * this.vector[0]) + "px",
+                'transform': transform,
+                '-webkit-transform': transform,
+                '-ms-transform': transform,
+                'top': this.y + 5 - ((distance / 2) * this.vector[1]) + "px",
                 'background-color': "" + this.traceColor
             });
             $("#graphicPart").append(trace);
+        };
+        Turtle.prototype.getTurtlesBottomEdge = function () {
         };
         Turtle.prototype.drawTurtle = function () {
             this.htmlRepresentation.css({
@@ -39,6 +42,8 @@ define(["require", "exports"], function (require, exports) {
         };
         Turtle.prototype.resetTurtle = function () {
             this.rotation = 0;
+            this.vector[0] = 0;
+            this.vector[1] = 1;
             this.placeAt($(window).width() / 2, $(window).height() / 2 - (($(window).height() / 10) * 2));
             $(".turtle-trace").remove();
         };
@@ -47,22 +52,30 @@ define(["require", "exports"], function (require, exports) {
             this.y = posY;
             this.drawTurtle();
         };
-        Turtle.prototype.move = function (posX, posY) {
+        Turtle.prototype.move = function (pos) {
             var oldX = this.x;
             var oldY = this.y;
-            this.x += this.vector[0] * posX;
-            this.y += this.vector[1] * posY;
+            this.x += this.vector[0] * pos;
+            this.y += this.vector[1] * pos;
             if (this.isTraceActive) {
                 this.drawTrace(oldX, oldY);
             }
             this.drawTurtle();
         };
+        Turtle.prototype.updateVector = function () {
+            //We add 90 degrees to recalibrate to our plan which has as origin the upward direction
+            var rotationRad = ((this.rotation + 90) * Math.PI) / 180;
+            this.vector[0] = Math.cos(rotationRad);
+            this.vector[1] = Math.sin(rotationRad);
+        };
         Turtle.prototype.rotate = function (degrees) {
             this.rotation = (this.rotation + degrees) % 360;
+            this.updateVector();
             this.drawTurtle();
         };
         Turtle.prototype.setRotation = function (degrees) {
             this.rotation = degrees % 360;
+            this.updateVector();
             this.drawTurtle();
         };
         Turtle.prototype.setTraceStatus = function (value) {

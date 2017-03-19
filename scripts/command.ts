@@ -84,7 +84,7 @@ export class AVCmd extends Command {
             return false;
         }
 
-        turtle.move(0, -this.args[0]);
+        turtle.move(-this.args[0]);
         return true;
     }
 }
@@ -108,7 +108,7 @@ export class RECmd extends Command{
             return false;
         }
 
-        turtle.move(0, this.args[0]);
+        turtle.move(this.args[0]);
         return true;
     }
 }

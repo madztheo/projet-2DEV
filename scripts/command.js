@@ -74,7 +74,7 @@ define(["require", "exports"], function (require, exports) {
             if (!success) {
                 return false;
             }
-            turtle.move(0, -this.args[0]);
+            turtle.move(-this.args[0]);
             return true;
         };
         return AVCmd;
@@ -98,7 +98,7 @@ define(["require", "exports"], function (require, exports) {
             if (!success) {
                 return false;
             }
-            turtle.move(0, this.args[0]);
+            turtle.move(this.args[0]);
             return true;
         };
         return RECmd;

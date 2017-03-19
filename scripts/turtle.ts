@@ -18,20 +18,25 @@ export class Turtle{
             <div class="turtle-trace">
             </div>
         `);
-        let distanceY = oldY - this.y;
-        let distanceX = oldX - this.x;
-        console.log(distanceY);
+        let distance = Math.sqrt(Math.pow(oldX - this.x, 2) + Math.pow(oldY - this.y, 2));
+        let transform = oldX > this.x || oldY > this.y ? `rotate(${this.rotation + 90}deg) translate(${distance+5}px,0)` : `rotate(${this.rotation + 90}deg) translate(5px,0)`;
+        console.log(distance);
         trace.css({
-            "height" : distanceY == 0 ? "2px" : `${Math.abs(distanceY)}px`,
-            "width" : distanceX == 0 ? "2px" : `${Math.abs(distanceX)}px`,
-            'left' : `${this.x + 4}px`,
-            /*'transform' :  `rotate(${this.rotation}deg)`,
-            '-webkit-transform' :  `rotate(${this.rotation}deg)`,
-            '-ms-transform' :  `rotate(${this.rotation}deg)`,*/
-            'top' : distanceY < 0 ? `${this.y + distanceY}px` : `${this.y + 10}px`,
+            "height" : "2px",
+            "width" : `${distance}px`,
+            //We need to compensate as the rotation of the div doesn't change the actual position of it
+            'left' : `${this.x + 5 - distance/2  - ((distance/2)*this.vector[0])}px`,
+            'transform' :  transform,
+            '-webkit-transform' :  transform,
+            '-ms-transform' :  transform,
+            'top' : `${this.y + 5 - ((distance/2)*this.vector[1])}px`,
             'background-color' : `${this.traceColor}`
         });
         $("#graphicPart").append(trace);
+
+    }
+
+    private getTurtlesBottomEdge(){
 
     }
 
@@ -48,6 +53,8 @@ export class Turtle{
 
     resetTurtle(){
         this.rotation = 0;
+        this.vector[0] = 0;
+        this.vector[1] = 1;
         this.placeAt($(window).width() / 2, $(window).height() / 2 - (($(window).height() / 10) * 2));
         $(".turtle-trace").remove();
     }
@@ -58,24 +65,33 @@ export class Turtle{
         this.drawTurtle();
     }
 
-    move(posX : number, posY : number){
+    move(pos : number){
         let oldX = this.x;
         let oldY = this.y;
-        this.x += this.vector[0] * posX;
-        this.y += this.vector[1] * posY;
+        this.x += this.vector[0] * pos;
+        this.y += this.vector[1] * pos;
         if(this.isTraceActive){
             this.drawTrace(oldX, oldY);
         }
         this.drawTurtle();
     }
 
+    private updateVector(){
+        //We add 90 degrees to recalibrate to our plan which has as origin the upward direction
+        let rotationRad = ((this.rotation + 90) * Math.PI) / 180;
+        this.vector[0] = Math.cos(rotationRad);
+        this.vector[1] = Math.sin(rotationRad);
+    }
+
     rotate(degrees : number){
-        this.rotation = (this.rotation + degrees) % 360
+        this.rotation = (this.rotation + degrees) % 360;
+        this.updateVector();
         this.drawTurtle();
     }
 
     setRotation(degrees : number){
         this.rotation = degrees % 360;
+        this.updateVector();
         this.drawTurtle();
     }
 
