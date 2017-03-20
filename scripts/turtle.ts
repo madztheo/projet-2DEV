@@ -19,25 +19,34 @@ export class Turtle{
             </div>
         `);
         let distance = Math.sqrt(Math.pow(oldX - this.x, 2) + Math.pow(oldY - this.y, 2));
-        let transform = oldX > this.x || oldY > this.y ? `rotate(${this.rotation + 90}deg) translate(${distance+5}px,0)` : `rotate(${this.rotation + 90}deg) translate(5px,0)`;
-        console.log(distance);
+        let transform = this.y < oldY || this.x < oldX || (this.y >= oldY && this.x >= oldX) ? `rotate(${this.rotation + 90}deg) translate(${distance}px,0)` : `rotate(${this.rotation + 90}deg) translate(0px,0)`;
+        console.log("old X : " + oldX + ", current X : " + this.x);
+        console.log("old Y : " + oldY + ", current Y : " + this.y);
+        //console.log(distance);
         trace.css({
             "height" : "2px",
             "width" : `${distance}px`,
             //We need to compensate as the rotation of the div doesn't change the actual position of it
-            'left' : `${this.x + 5 - distance/2  - ((distance/2)*this.vector[0])}px`,
+            'left' : `${this.getTurtlesBottomEdge()[0] - distance/2  - ((distance/2)*this.vector[0])}px`,
             'transform' :  transform,
             '-webkit-transform' :  transform,
             '-ms-transform' :  transform,
-            'top' : `${this.y + 5 - ((distance/2)*this.vector[1])}px`,
+            'top' : `${this.getTurtlesBottomEdge()[1] - ((distance/2)*this.vector[1])}px`,
             'background-color' : `${this.traceColor}`
         });
+        let positiveRotation : number;
+        if(this.rotation >= 0){
+            positiveRotation = this.rotation;
+        }else{
+            positiveRotation = 360 + this.rotation;
+        }
         $("#graphicPart").append(trace);
 
     }
 
-    private getTurtlesBottomEdge(){
-
+    private getTurtlesBottomEdge() : number[]{
+        return [(this.x + 5) + (5 * this.vector[0]),
+        (this.y + 5) + (5 * this.vector[1])];
     }
 
     private drawTurtle(){

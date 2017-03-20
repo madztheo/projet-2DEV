@@ -20,7 +20,7 @@ export abstract class Command{
      * Analyze the command and if it is correct retrieve all the arguments from it
      * @param command The command to be analyzed
      */
-    private check(command : string) : boolean {
+    check(command : string) : boolean {
         command = command.trim(); //Get rid of the eventual spaces at the beginning and end of the command
         let cmdParts = command.split(" "); //Split the command into an array to get the name and arguments
         cmdParts.forEach(x => x = x.trim()); //Make sure to get rid of the spaces in every elements of the array
@@ -287,26 +287,118 @@ export class MTCmd extends Command{
     }
 }
 
+interface SubCommand{
+    literalCmd : string;
+    command : Command;
+}
+
 /**
  * The REPETE command to repete another command a certain number of times
  */
 export class REPETECmd extends Command{
+    subcommands : SubCommand[] = [];
+
     constructor(){
         super();
         this.cmdName = "REPETE";
         this.expectedArgs = [
             { name : "times", type : "number" },
-            { name : "commands", type : "command" }
+            { name : "commands", type : "commands" }
         ];;
+    }
+    
+    getSubcommands(command : string){
+        let subcmds = command.substring(command.indexOf("["));
+        subcmds = subcmds.replace("[", "");
+        subcmds = subcmds.replace("]", "");
+        console.log(subcmds);
+        let cmd = "";
+        while(subcmds.length > 0 && cmd != subcmds){
+            cmd = "";
+            let newCommand : Command;
+            let isOK = false;
+            for(let character of subcmds){
+                cmd += character;
+                let success = false;
+                for(let cmdType of cmdList){
+                    let newCmd = Object.create(cmdType);
+                    success = newCmd.check(cmd);
+                    if(success){
+                        newCommand = newCmd;
+                        isOK = true;
+                        break;
+                    }
+                }
+                if(isOK && (!success || cmd.length == subcmds.length)){
+                    if(subcmds.length == cmd.length){
+                        this.subcommands.push({ 
+                            literalCmd : cmd, command : newCommand
+                        });
+                    } else{
+                        this.subcommands.push({ 
+                            literalCmd : cmd.substring(0, cmd.length - 1), command : newCommand
+                        });
+                    }
+                    subcmds = subcmds.replace(cmd.substring(0, cmd.length - 1), "");
+                    cmd = cmd.substring(cmd.length - 1);
+                    isOK = false;
+                    break;
+                }
+            }
+        }
+        console.log(this.subcommands);
+    }
+
+    check(command: string) : boolean {
+        command = command.trim(); //Get rid of the eventual spaces at the beginning and end of the command
+        let cmdParts = command.split(" ", 2); //Split the command into an array to get the name and times argument
+        cmdParts.forEach(x => x = x.trim()); //Make sure to get rid of the spaces in every elements of the array
+
+        //First check if the name of the command is the right one
+        let cmdName = cmdParts[0];
+        if(cmdName != this.cmdName){
+            return false;
+        }
+
+        cmdParts.shift(); //Take out the command's name from the array
+
+        this.args = cmdParts; //Update the array of arguments with the arguments retrieved from the command
+
+        //Check if the arguments passed match with the expected arguments
+        for(let i = 0; i < this.args.length; i++){
+            if(this.expectedArgs[i].type == "number"){
+                let nb = parseInt(this.args[i]);
+                if(isNaN(nb)){
+                    return false;
+                }
+                this.args[i] = nb;
+            }
+        }
+
+        this.getSubcommands(command);
+
+        return true;
     }
         
     execute(cmd : string, turtle : Turtle) : boolean{
-        let success = super.execute(cmd, turtle);
+        let success = this.check(cmd);
         if(!success){
             return false;
         }
 
-
+        for(let i = 0; i < this.args[0]; i++){
+            setTimeout(() => {
+                for(let cmd of this.subcommands){
+                    cmd.command.execute(cmd.literalCmd, turtle);
+                }
+            }, 100 * (i + 1));
+        }
         return true;
     }
 }
+
+export const cmdList : Command[] = [
+    new AVCmd(), new RECmd(), new CTCmd(), new BCCmd(), 
+    new FCCCmd(), new LCCmd(), new MTCmd(), new TDCmd(), new TGCmd(), 
+    new VECmd()
+];

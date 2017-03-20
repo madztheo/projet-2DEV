@@ -47,6 +47,9 @@ define(["require", "exports", "./turtle", "./command"], function (require, expor
                 case "MT":
                     cmdToExecute = new command_1.MTCmd();
                     break;
+                case "REPETE":
+                    cmdToExecute = new command_1.REPETECmd();
+                    break;
             }
             if (cmdToExecute != null) {
                 return cmdToExecute.execute(cmd, this.turtle);
