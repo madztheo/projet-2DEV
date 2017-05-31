@@ -316,7 +316,7 @@ export class REPETECmd extends Command{
     }
 
     protected buildRegEx() : RegExp {
-        return /^[A-Z]+ [0-9]+ \[(#?(\w|\s))+\]/;
+        return /^[A-Z]+ [0-9]+ \[(#?(\w|\s))+\]\s*$/;
     }
 
     getSubCommands() {

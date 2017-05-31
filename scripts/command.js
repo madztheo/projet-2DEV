@@ -317,7 +317,7 @@ define(["require", "exports"], function (require, exports) {
             return _this;
         }
         REPETECmd.prototype.buildRegEx = function () {
-            return /^[A-Z]+ [0-9]+ \[(#?(\w|\s))+\]/;
+            return /^[A-Z]+ [0-9]+ \[(#?(\w|\s))+\]\s*$/;
         };
         REPETECmd.prototype.getSubCommands = function () {
             var currentCmdStr = "";
