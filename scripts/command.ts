@@ -18,14 +18,15 @@ export abstract class Command{
 
     protected buildRegEx() : RegExp {
         let strRegex = "^[A-Z]+";
+        console.log(this.expectedArgs);
         for(let arg of this.expectedArgs){
             if(arg.type == "number"){
                 strRegex += " [0-9]+";
             } else {
-                strRegex + " #?\w+";
+                strRegex += " #?\\w+";
             }
         }
-        return new RegExp(strRegex + "\s*$");
+        return new RegExp(strRegex + "\\s*$");
     }
 
     /**
@@ -36,7 +37,7 @@ export abstract class Command{
         command = command.trim(); //Get rid of the eventual spaces at the beginning and end of the command
 
         const regex = this.buildRegEx();
-
+        console.log(regex);
         if(!regex.test(command)){
             return false;
         }

@@ -19,16 +19,17 @@ define(["require", "exports"], function (require, exports) {
         }
         Command.prototype.buildRegEx = function () {
             var strRegex = "^[A-Z]+";
+            console.log(this.expectedArgs);
             for (var _i = 0, _a = this.expectedArgs; _i < _a.length; _i++) {
                 var arg = _a[_i];
                 if (arg.type == "number") {
                     strRegex += " [0-9]+";
                 }
                 else {
-                    strRegex + " #?\w+";
+                    strRegex += " #?\\w+";
                 }
             }
-            return new RegExp(strRegex + "\s*$");
+            return new RegExp(strRegex + "\\s*$");
         };
         /**
          * Analyze the command and if it is correct retrieve all the arguments from it
@@ -37,6 +38,7 @@ define(["require", "exports"], function (require, exports) {
         Command.prototype.check = function (command) {
             command = command.trim(); //Get rid of the eventual spaces at the beginning and end of the command
             var regex = this.buildRegEx();
+            console.log(regex);
             if (!regex.test(command)) {
                 return false;
             }
