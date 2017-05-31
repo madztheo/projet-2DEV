@@ -9,8 +9,8 @@ export class CommandManager{
     }
 
     private getCommandName(cmd: string){
-        var regex = /^[A-Z]*/g;
-        return regex.exec(cmd)[0];
+        var regex = /^\s*[A-Z]*/g;
+        return (regex.exec(cmd)[0]).trim();
     }
 
     executeCommand(cmd : string) : boolean {
