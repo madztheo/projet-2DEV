@@ -1,46 +1,60 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 define(["require", "exports"], function (require, exports) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     /**
      * Class representing the basic structure of a LOGO command
      */
     var Command = (function () {
         function Command() {
         }
+        Command.prototype.buildRegEx = function () {
+            var strRegex = "^[A-Z]+";
+            for (var _i = 0, _a = this.expectedArgs; _i < _a.length; _i++) {
+                var arg = _a[_i];
+                if (arg.type == "number") {
+                    strRegex += " [0-9]+";
+                }
+                else {
+                    strRegex + " #?\w+";
+                }
+            }
+            return new RegExp(strRegex);
+        };
         /**
          * Analyze the command and if it is correct retrieve all the arguments from it
          * @param command The command to be analyzed
          */
         Command.prototype.check = function (command) {
             command = command.trim(); //Get rid of the eventual spaces at the beginning and end of the command
-            var cmdParts = command.split(" "); //Split the command into an array to get the name and arguments
-            cmdParts.forEach(function (x) { return x = x.trim(); }); //Make sure to get rid of the spaces in every elements of the array
-            //Check if all the necessary have been given
-            if (cmdParts.length <= this.expectedArgs.length || cmdParts.length > this.expectedArgs.length + 1) {
+            var regex = this.buildRegEx();
+            if (!regex.test(command)) {
                 return false;
             }
-            //First check if the name of the command is the right one
-            var cmdName = cmdParts[0];
-            if (cmdName != this.cmdName) {
-                return false;
-            }
-            cmdParts.shift(); //Take out the command's name from the array
-            this.args = cmdParts; //Update the array of arguments with the arguments retrieved from the command
-            //Check if the arguments passed match with the expected arguments
-            for (var i = 0; i < this.args.length; i++) {
-                if (this.expectedArgs[i].type == "number") {
-                    var nb = parseInt(this.args[i]);
-                    if (isNaN(nb)) {
+            command = command.replace(/^[A-Z]+/, ""); //We take out the name of the command
+            this.args = command.match(/#?\w+/g); //Update the array of arguments with the arguments retrieved from the command
+            if (this.args != null) {
+                //Check if the arguments passed match with the expected arguments types
+                for (var i = 0; i < this.args.length; i++) {
+                    if (this.expectedArgs[i].type == "number") {
+                        var nb = parseInt(this.args[i]);
+                        if (isNaN(nb)) {
+                            return false;
+                        }
+                        this.args[i] = nb;
+                    }
+                    else if (this.expectedArgs[i].type != typeof this.args[i]) {
                         return false;
                     }
-                    this.args[i] = nb;
-                }
-                else if (this.expectedArgs[i].type != typeof this.args[i]) {
-                    return false;
                 }
             }
             return true;
@@ -302,72 +316,65 @@ define(["require", "exports"], function (require, exports) {
             ;
             return _this;
         }
-        REPETECmd.prototype.getSubcommands = function (command) {
-            var subcmds = command.substring(command.indexOf("["));
-            subcmds = subcmds.replace("[", "");
-            subcmds = subcmds.replace("]", "");
-            console.log(subcmds);
-            var cmd = "";
-            while (subcmds.length > 0 && cmd != subcmds) {
-                cmd = "";
-                var newCommand = void 0;
-                var isOK = false;
-                for (var _i = 0, subcmds_1 = subcmds; _i < subcmds_1.length; _i++) {
-                    var character = subcmds_1[_i];
-                    cmd += character;
-                    var success = false;
-                    for (var _a = 0, cmdList_1 = exports.cmdList; _a < cmdList_1.length; _a++) {
-                        var cmdType = cmdList_1[_a];
-                        var newCmd = Object.create(cmdType);
-                        success = newCmd.check(cmd);
-                        if (success) {
-                            newCommand = newCmd;
-                            isOK = true;
-                            break;
+        REPETECmd.prototype.getSubCommands = function () {
+            var currentCmdStr = "";
+            var currentCmd = null;
+            for (var i = 1; i < this.args.length; i++) {
+                var arg = this.args[i];
+                var newCmd = false;
+                for (var _i = 0, cmdList_1 = exports.cmdList; _i < cmdList_1.length; _i++) {
+                    var cmd = cmdList_1[_i];
+                    if (cmd.cmdName == arg) {
+                        if (currentCmd != null) {
+                            console.log("Command : ");
+                            console.log(currentCmd);
+                            if (currentCmd.check(currentCmdStr)) {
+                                this.subcommands.push({
+                                    literalCmd: currentCmdStr, command: currentCmd
+                                });
+                            }
                         }
-                    }
-                    if (isOK && (!success || cmd.length == subcmds.length)) {
-                        if (subcmds.length == cmd.length) {
-                            this.subcommands.push({
-                                literalCmd: cmd, command: newCommand
-                            });
-                        }
-                        else {
-                            this.subcommands.push({
-                                literalCmd: cmd.substring(0, cmd.length - 1), command: newCommand
-                            });
-                        }
-                        subcmds = subcmds.replace(cmd.substring(0, cmd.length - 1), "");
-                        cmd = cmd.substring(cmd.length - 1);
-                        isOK = false;
+                        currentCmd = Object.create(cmd);
+                        newCmd = true;
+                        currentCmdStr = arg;
                         break;
                     }
                 }
+                if (!newCmd) {
+                    currentCmdStr += " " + arg;
+                }
             }
-            console.log(this.subcommands);
+            if (currentCmd != null) {
+                console.log("Command : ");
+                console.log(currentCmd);
+                if (currentCmd.check(currentCmdStr)) {
+                    this.subcommands.push({
+                        literalCmd: currentCmdStr, command: currentCmd
+                    });
+                }
+            }
         };
         REPETECmd.prototype.check = function (command) {
             command = command.trim(); //Get rid of the eventual spaces at the beginning and end of the command
-            var cmdParts = command.split(" ", 2); //Split the command into an array to get the name and times argument
-            cmdParts.forEach(function (x) { return x = x.trim(); }); //Make sure to get rid of the spaces in every elements of the array
-            //First check if the name of the command is the right one
-            var cmdName = cmdParts[0];
-            if (cmdName != this.cmdName) {
+            var regex = this.buildRegEx();
+            if (!regex.test(command)) {
                 return false;
             }
-            cmdParts.shift(); //Take out the command's name from the array
-            this.args = cmdParts; //Update the array of arguments with the arguments retrieved from the command
-            //Check if the arguments passed match with the expected arguments
-            for (var i = 0; i < this.args.length; i++) {
-                if (this.expectedArgs[i].type == "number") {
-                    var nb = parseInt(this.args[i]);
-                    if (isNaN(nb)) {
-                        return false;
+            command = command.replace(/^[A-Z]+/, ""); //We take out the name of the command
+            this.args = command.match(/#?\w+/g); //Update the array of arguments with the arguments retrieved from the command
+            if (this.args != null) {
+                //Check if the arguments passed match with the expected arguments
+                for (var i = 0; i < this.args.length; i++) {
+                    if (i < this.expectedArgs.length && this.expectedArgs[i].type == "number") {
+                        var nb = parseInt(this.args[i]);
+                        if (isNaN(nb)) {
+                            return false;
+                        }
+                        this.args[i] = nb;
                     }
-                    this.args[i] = nb;
                 }
             }
-            this.getSubcommands(command);
+            this.getSubCommands();
             return true;
         };
         REPETECmd.prototype.execute = function (cmd, turtle) {
@@ -392,7 +399,7 @@ define(["require", "exports"], function (require, exports) {
     exports.cmdList = [
         new AVCmd(), new RECmd(), new CTCmd(), new BCCmd(),
         new FCCCmd(), new LCCmd(), new MTCmd(), new TDCmd(), new TGCmd(),
-        new VECmd()
+        new VECmd(), new REPETECmd()
     ];
 });
 //# sourceMappingURL=command.js.map

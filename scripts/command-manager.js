@@ -1,55 +1,22 @@
 define(["require", "exports", "./turtle", "./command"], function (require, exports, turtle_1, command_1) {
     "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
     var CommandManager = (function () {
         function CommandManager() {
             this.turtle = new turtle_1.Turtle();
         }
         CommandManager.prototype.getCommandName = function (cmd) {
-            cmd = cmd.trim();
-            var cmdParts = cmd.split(" ");
-            cmdParts.forEach(function (x) { return x = x.trim(); });
-            if (cmdParts.length == 0) {
-                return "";
-            }
-            return cmdParts[0];
+            var regex = /^[A-Z]*/g;
+            return regex.exec(cmd)[0];
         };
         CommandManager.prototype.executeCommand = function (cmd) {
             var cmdName = this.getCommandName(cmd);
             var cmdToExecute;
-            switch (cmdName) {
-                case "AV":
-                    cmdToExecute = new command_1.AVCmd();
-                    break;
-                case "RE":
-                    cmdToExecute = new command_1.RECmd();
-                    break;
-                case "TD":
-                    cmdToExecute = new command_1.TDCmd();
-                    break;
-                case "TG":
-                    cmdToExecute = new command_1.TGCmd();
-                    break;
-                case "FCC":
-                    cmdToExecute = new command_1.FCCCmd();
-                    break;
-                case "LC":
-                    cmdToExecute = new command_1.LCCmd();
-                    break;
-                case "BC":
-                    cmdToExecute = new command_1.BCCmd();
-                    break;
-                case "VE":
-                    cmdToExecute = new command_1.VECmd();
-                    break;
-                case "CT":
-                    cmdToExecute = new command_1.CTCmd();
-                    break;
-                case "MT":
-                    cmdToExecute = new command_1.MTCmd();
-                    break;
-                case "REPETE":
-                    cmdToExecute = new command_1.REPETECmd();
-                    break;
+            for (var _i = 0, cmdList_1 = command_1.cmdList; _i < cmdList_1.length; _i++) {
+                var command = cmdList_1[_i];
+                if (cmdName == command.cmdName) {
+                    cmdToExecute = Object.create(command);
+                }
             }
             if (cmdToExecute != null) {
                 return cmdToExecute.execute(cmd, this.turtle);
