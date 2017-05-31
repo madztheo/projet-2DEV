@@ -25,7 +25,7 @@ export abstract class Command{
                 strRegex + " #?\w+";
             }
         }
-        return new RegExp(strRegex);
+        return new RegExp(strRegex + "\s*$");
     }
 
     /**
@@ -313,6 +313,10 @@ export class REPETECmd extends Command{
             { name : "times", type : "number" },
             { name : "commands", type : "commands" }
         ];;
+    }
+
+    protected buildRegEx() : RegExp {
+        return /^[A-Z]+ [0-9]+ \[(#?(\w|\s))+\]/;
     }
 
     getSubCommands() {

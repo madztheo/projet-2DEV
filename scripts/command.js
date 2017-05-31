@@ -28,7 +28,7 @@ define(["require", "exports"], function (require, exports) {
                     strRegex + " #?\w+";
                 }
             }
-            return new RegExp(strRegex);
+            return new RegExp(strRegex + "\s*$");
         };
         /**
          * Analyze the command and if it is correct retrieve all the arguments from it
@@ -316,6 +316,9 @@ define(["require", "exports"], function (require, exports) {
             ;
             return _this;
         }
+        REPETECmd.prototype.buildRegEx = function () {
+            return /^[A-Z]+ [0-9]+ \[(#?(\w|\s))+\]/;
+        };
         REPETECmd.prototype.getSubCommands = function () {
             var currentCmdStr = "";
             var currentCmd = null;

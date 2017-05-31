@@ -8,8 +8,10 @@
     </head>
     <body>
         <div id="graphicPart">
-            <div id="turtle">
-            </div>
+            <svg id="drawingCanvas" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                <polygon id="turtle" points="100,100 110,100 105,90"
+                style="fill:white;stroke:white;stroke-width:1" />
+            </svg>
         </div>
         <div id="shell">
             <div class="shell-content">
@@ -21,7 +23,7 @@
             </div>
         </div>
         <script src="./scripts/jquery-3.1.1.min.js"></script>
-        <!-- We use require.js to be able to use module without using a server -->
+        <!-- We use require.js to be able to use module without then need of a server -->
         <script data-main="./scripts/logo" src="./require.js"></script>
     </body>
 </html>

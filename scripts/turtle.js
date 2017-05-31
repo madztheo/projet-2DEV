@@ -12,45 +12,24 @@ define(["require", "exports"], function (require, exports) {
             this.resetTurtle();
         }
         Turtle.prototype.drawTrace = function (oldX, oldY) {
-            var trace = $("\n            <div class=\"turtle-trace\">\n            </div>\n        ");
-            var distance = Math.sqrt(Math.pow(oldX - this.x, 2) + Math.pow(oldY - this.y, 2));
-            var transform = this.y < oldY || this.x < oldX || (this.y >= oldY && this.x >= oldX) ? "rotate(" + (this.rotation + 90) + "deg) translate(" + distance + "px,0)" : "rotate(" + (this.rotation + 90) + "deg) translate(0px,0)";
-            console.log("old X : " + oldX + ", current X : " + this.x);
-            console.log("old Y : " + oldY + ", current Y : " + this.y);
-            //console.log(distance);
-            trace.css({
-                "height": "2px",
-                "width": distance + "px",
-                //We need to compensate as the rotation of the div doesn't change the actual position of it
-                'left': this.getTurtlesBottomEdge()[0] - distance / 2 - ((distance / 2) * this.vector[0]) + "px",
-                'transform': transform,
-                '-webkit-transform': transform,
-                '-ms-transform': transform,
-                'top': this.getTurtlesBottomEdge()[1] - ((distance / 2) * this.vector[1]) + "px",
-                'background-color': "" + this.traceColor
-            });
-            var positiveRotation;
-            if (this.rotation >= 0) {
-                positiveRotation = this.rotation;
-            }
-            else {
-                positiveRotation = 360 + this.rotation;
-            }
-            $("#graphicPart").append(trace);
+            var trace = $("\n            <line x1=\"" + oldX + "\" y1=\"" + oldY + "\" x2=\"" + this.x + "\" y2=\"" + this.y + "\" class=\"turtle-trace\"\n             style=\"fill:" + this.traceColor + ";stroke:" + this.traceColor + ";stroke-width:1\"/>\n        ");
+            $("#drawingCanvas").append(trace);
+            //To force the visual update of the svg
+            $("#drawingCanvas").html($("#drawingCanvas").html());
         };
         Turtle.prototype.getTurtlesBottomEdge = function () {
             return [(this.x + 5) + (5 * this.vector[0]),
                 (this.y + 5) + (5 * this.vector[1])];
         };
         Turtle.prototype.drawTurtle = function () {
-            this.htmlRepresentation.css({
-                'left': this.x + "px",
-                'top': this.y + "px",
-                'transform': "rotate(" + this.rotation + "deg)",
-                '-webkit-transform': "rotate(" + this.rotation + "deg)",
-                '-ms-transform': "rotate(" + this.rotation + "deg)",
-                'display': this.isVisible ? "block" : "none"
-            });
+            this.htmlRepresentation.attr('points', this.x - 5 + "," + this.y + " " + this.x + "," + (this.y - 10) + " " + (this.x + 5) + "," + this.y);
+            this.htmlRepresentation.attr('transform', "rotate(" + this.rotation + " " + this.x + " " + this.y + ")");
+            $("#turtle").remove();
+            $("#drawingCanvas").html($("#drawingCanvas").html());
+            if (this.isVisible) {
+                $("#drawingCanvas").append(this.htmlRepresentation);
+                $("#drawingCanvas").html($("#drawingCanvas").html());
+            }
         };
         Turtle.prototype.resetTurtle = function () {
             this.rotation = 0;
@@ -58,6 +37,7 @@ define(["require", "exports"], function (require, exports) {
             this.vector[1] = 1;
             this.placeAt($(window).width() / 2, $(window).height() / 2 - (($(window).height() / 10) * 2));
             $(".turtle-trace").remove();
+            $("#drawingCanvas").html($("#drawingCanvas").html());
         };
         Turtle.prototype.placeAt = function (posX, posY) {
             this.x = posX;
