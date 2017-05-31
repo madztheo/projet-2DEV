@@ -18,15 +18,18 @@ define(["require", "exports"], function (require, exports) {
         function Command() {
         }
         Command.prototype.buildRegEx = function () {
-            var strRegex = "^[A-Z]+";
+            var strRegex = "^\\s*" + this.cmdName;
             console.log(this.expectedArgs);
             for (var _i = 0, _a = this.expectedArgs; _i < _a.length; _i++) {
                 var arg = _a[_i];
                 if (arg.type == "number") {
-                    strRegex += " [0-9]+";
+                    strRegex += "\\s*[0-9]+";
+                }
+                else if (arg.type == "hexadecimal") {
+                    strRegex += "\\s*#?[0-9A-Fa-f]+";
                 }
                 else {
-                    strRegex += " #?\\w+";
+                    strRegex += "\\s*#?\\w+";
                 }
             }
             return new RegExp(strRegex + "\\s*$");
@@ -36,13 +39,12 @@ define(["require", "exports"], function (require, exports) {
          * @param command The command to be analyzed
          */
         Command.prototype.check = function (command) {
-            command = command.trim(); //Get rid of the eventual spaces at the beginning and end of the command
             var regex = this.buildRegEx();
-            console.log(regex);
             if (!regex.test(command)) {
                 return false;
             }
-            command = command.replace(/^[A-Z]+/, ""); //We take out the name of the command
+            console.log(regex);
+            command = command.replace(this.cmdName, ""); //We take out the name of the command
             this.args = command.match(/#?\w+/g); //Update the array of arguments with the arguments retrieved from the command
             if (this.args != null) {
                 //Check if the arguments passed match with the expected arguments types
@@ -53,9 +55,6 @@ define(["require", "exports"], function (require, exports) {
                             return false;
                         }
                         this.args[i] = nb;
-                    }
-                    else if (this.expectedArgs[i].type != typeof this.args[i]) {
-                        return false;
                     }
                 }
             }
@@ -177,7 +176,7 @@ define(["require", "exports"], function (require, exports) {
             var _this = _super.call(this) || this;
             _this.cmdName = "FCC";
             _this.expectedArgs = [
-                { name: "color", type: "string" }
+                { name: "color", type: "hexadecimal" }
             ];
             return _this;
         }
@@ -319,7 +318,7 @@ define(["require", "exports"], function (require, exports) {
             return _this;
         }
         REPETECmd.prototype.buildRegEx = function () {
-            return /^[A-Z]+ [0-9]+ \[(#?(\w|\s))+\]\s*$/;
+            return /^REPETE\s*[0-9]+\s*\[(#?(\w|\s))+\]\s*$/;
         };
         REPETECmd.prototype.getSubCommands = function () {
             var currentCmdStr = "";
@@ -331,12 +330,13 @@ define(["require", "exports"], function (require, exports) {
                     var cmd = cmdList_1[_i];
                     if (cmd.cmdName == arg) {
                         if (currentCmd != null) {
-                            console.log("Command : ");
-                            console.log(currentCmd);
                             if (currentCmd.check(currentCmdStr)) {
                                 this.subcommands.push({
                                     literalCmd: currentCmdStr, command: currentCmd
                                 });
+                            }
+                            else {
+                                return false;
                             }
                         }
                         currentCmd = Object.create(cmd);
@@ -350,22 +350,25 @@ define(["require", "exports"], function (require, exports) {
                 }
             }
             if (currentCmd != null) {
-                console.log("Command : ");
-                console.log(currentCmd);
+                /*console.log("Command : ");
+                console.log(currentCmd);*/
                 if (currentCmd.check(currentCmdStr)) {
                     this.subcommands.push({
                         literalCmd: currentCmdStr, command: currentCmd
                     });
                 }
+                else {
+                    return false;
+                }
             }
+            return true;
         };
         REPETECmd.prototype.check = function (command) {
-            command = command.trim(); //Get rid of the eventual spaces at the beginning and end of the command
             var regex = this.buildRegEx();
             if (!regex.test(command)) {
                 return false;
             }
-            command = command.replace(/^[A-Z]+/, ""); //We take out the name of the command
+            command = command.replace(this.cmdName, ""); //We take out the name of the command
             this.args = command.match(/#?\w+/g); //Update the array of arguments with the arguments retrieved from the command
             if (this.args != null) {
                 //Check if the arguments passed match with the expected arguments
@@ -379,8 +382,7 @@ define(["require", "exports"], function (require, exports) {
                     }
                 }
             }
-            this.getSubCommands();
-            return true;
+            return this.getSubCommands();
         };
         REPETECmd.prototype.execute = function (cmd, turtle) {
             var _this = this;

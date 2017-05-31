@@ -17,13 +17,16 @@ export abstract class Command{
     protected args : any[]; //The actual arguments
 
     protected buildRegEx() : RegExp {
-        let strRegex = "^[A-Z]+";
+        let strRegex = "^\\s*" + this.cmdName;
         console.log(this.expectedArgs);
         for(let arg of this.expectedArgs){
             if(arg.type == "number"){
-                strRegex += " [0-9]+";
-            } else {
-                strRegex += " #?\\w+";
+                strRegex += "\\s*[0-9]+";
+            } else if (arg.type == "hexadecimal") {
+                strRegex += "\\s*#?[0-9A-Fa-f]+";
+            } 
+            else {
+                strRegex += "\\s*#?\\w+";
             }
         }
         return new RegExp(strRegex + "\\s*$");
@@ -34,17 +37,16 @@ export abstract class Command{
      * @param command The command to be analyzed
      */
     check(command : string) : boolean {
-        command = command.trim(); //Get rid of the eventual spaces at the beginning and end of the command
-
         const regex = this.buildRegEx();
-        console.log(regex);
+       
         if(!regex.test(command)){
             return false;
         }
-
-        command = command.replace(/^[A-Z]+/, "");//We take out the name of the command
+        console.log(regex);
+        command = command.replace(this.cmdName, "");//We take out the name of the command
 
         this.args = command.match(/#?\w+/g); //Update the array of arguments with the arguments retrieved from the command
+        
         
         if(this.args != null){
             //Check if the arguments passed match with the expected arguments types
@@ -55,8 +57,6 @@ export abstract class Command{
                         return false;
                     }
                     this.args[i] = nb;
-                } else if(this.expectedArgs[i].type != typeof this.args[i]){
-                    return false;
                 }
             }
         }
@@ -176,7 +176,7 @@ export class FCCCmd extends Command{
         super();
         this.cmdName = "FCC";
         this.expectedArgs = [
-            { name : "color", type : "string" }
+            { name : "color", type : "hexadecimal" }
         ];
     }
         
@@ -317,10 +317,10 @@ export class REPETECmd extends Command{
     }
 
     protected buildRegEx() : RegExp {
-        return /^[A-Z]+ [0-9]+ \[(#?(\w|\s))+\]\s*$/;
+        return /^REPETE\s*[0-9]+\s*\[(#?(\w|\s))+\]\s*$/;
     }
 
-    getSubCommands() {
+    getSubCommands() : boolean {
         let currentCmdStr = "";
         let currentCmd : Command = null;
         for(let i = 1; i < this.args.length; i++){
@@ -330,12 +330,12 @@ export class REPETECmd extends Command{
                 if(cmd.cmdName == arg)
                 {
                     if(currentCmd != null){
-                        console.log("Command : ");
-                        console.log(currentCmd);
                         if(currentCmd.check(currentCmdStr)){
                             this.subcommands.push({ 
                                 literalCmd : currentCmdStr, command : currentCmd
                             });
+                        } else {
+                            return false;
                         }
                     }
                     currentCmd = Object.create(cmd);
@@ -349,29 +349,30 @@ export class REPETECmd extends Command{
             }
         }
         if(currentCmd != null){
-            console.log("Command : ");
-            console.log(currentCmd);
+            /*console.log("Command : ");
+            console.log(currentCmd);*/
             if(currentCmd.check(currentCmdStr)){
                 this.subcommands.push({ 
                     literalCmd : currentCmdStr, command : currentCmd
                 });
+            } else {
+                return false;
             }
         }
+        return true;
     }
 
     check(command: string) : boolean {
-        command = command.trim(); //Get rid of the eventual spaces at the beginning and end of the command
-
         const regex = this.buildRegEx();
 
         if(!regex.test(command)){
             return false;
         }
 
-        command = command.replace(/^[A-Z]+/, "");//We take out the name of the command
+        command = command.replace(this.cmdName, "");//We take out the name of the command
 
         this.args = command.match(/#?\w+/g); //Update the array of arguments with the arguments retrieved from the command
-        
+
         if(this.args != null){
             //Check if the arguments passed match with the expected arguments
             for(let i = 0; i < this.args.length; i++){
@@ -385,8 +386,7 @@ export class REPETECmd extends Command{
             }
         }
 
-        this.getSubCommands();
-        return true;
+        return this.getSubCommands();
     }
         
     execute(cmd : string, turtle : Turtle) : boolean{
