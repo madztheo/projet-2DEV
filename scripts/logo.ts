@@ -9,6 +9,13 @@ export const screen = $("#graphicPart");
 
 let currentCommandIndex = -1;
 
+
+$(window).keydown(function(){
+    $("#consoleInput").focus();
+});
+
+$("#consoleInput").focus();
+
 $("#consoleInput").keydown(function(event : JQueryKeyEventObject){
     if(event.which == 13){//Enter
         checkInput($(this).val());
@@ -47,8 +54,3 @@ function updateCommandHistory(cmd : string){
         $("#cmdHistoryList li:first").css("display", "block");
     }
 }
-
-/*let i = 0;
-setInterval(() => {
-    i++;
-}, 500);*/

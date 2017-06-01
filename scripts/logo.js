@@ -5,6 +5,10 @@ define(["require", "exports", "./command-manager"], function (require, exports, 
     var commandHistory = [];
     exports.screen = $("#graphicPart");
     var currentCommandIndex = -1;
+    $(window).keydown(function () {
+        $("#consoleInput").focus();
+    });
+    $("#consoleInput").focus();
     $("#consoleInput").keydown(function (event) {
         if (event.which == 13) {
             checkInput($(this).val());
@@ -42,8 +46,4 @@ define(["require", "exports", "./command-manager"], function (require, exports, 
         }
     }
 });
-/*let i = 0;
-setInterval(() => {
-    i++;
-}, 500);*/ 
 //# sourceMappingURL=logo.js.map

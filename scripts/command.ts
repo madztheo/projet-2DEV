@@ -349,8 +349,6 @@ export class REPETECmd extends Command{
             }
         }
         if(currentCmd != null){
-            /*console.log("Command : ");
-            console.log(currentCmd);*/
             if(currentCmd.check(currentCmdStr)){
                 this.subcommands.push({ 
                     literalCmd : currentCmdStr, command : currentCmd

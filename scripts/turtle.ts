@@ -22,11 +22,6 @@ export class Turtle{
         //To force the visual update of the svg
         $("#drawingCanvas").html($("#drawingCanvas").html());
     }
-
-    private getTurtlesBottomEdge() : number[]{
-        return [(this.x + 5) + (5 * this.vector[0]),
-        (this.y + 5) + (5 * this.vector[1])];
-    }
     
     private drawTurtle(){
         this.htmlRepresentation.attr('points', `${this.x-5},${this.y} ${this.x},${this.y-10} ${this.x+5},${this.y}`);

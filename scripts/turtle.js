@@ -17,10 +17,6 @@ define(["require", "exports"], function (require, exports) {
             //To force the visual update of the svg
             $("#drawingCanvas").html($("#drawingCanvas").html());
         };
-        Turtle.prototype.getTurtlesBottomEdge = function () {
-            return [(this.x + 5) + (5 * this.vector[0]),
-                (this.y + 5) + (5 * this.vector[1])];
-        };
         Turtle.prototype.drawTurtle = function () {
             this.htmlRepresentation.attr('points', this.x - 5 + "," + this.y + " " + this.x + "," + (this.y - 10) + " " + (this.x + 5) + "," + this.y);
             this.htmlRepresentation.attr('transform', "rotate(" + this.rotation + " " + this.x + " " + this.y + ")");
