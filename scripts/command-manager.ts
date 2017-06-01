@@ -1,5 +1,5 @@
 import { Turtle } from "./turtle";
-import { AVCmd, BCCmd, Command, CTCmd, FCCCmd, LCCmd, MTCmd, RECmd, REPETECmd, TDCmd, TGCmd, VECmd, cmdList } from './command';
+import { AVCmd, BCCmd, Command, CTCmd, FCCCmd, LCCmd, MTCmd, RECmd, REPETECmd, TDCmd, TGCmd, VECmd, cmdClasses } from './command';
 
 export class CommandManager{
     turtle : Turtle;
@@ -16,9 +16,10 @@ export class CommandManager{
     executeCommand(cmd : string) : boolean {
         let cmdName = this.getCommandName(cmd);
         let cmdToExecute : Command;
-        for(let command of cmdList){
+        for(let cmdClass of cmdClasses){
+            let command = new cmdClass();
             if(cmdName == command.cmdName){
-                cmdToExecute = Object.create(command);
+                cmdToExecute = command;
             }
         }
         

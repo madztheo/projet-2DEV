@@ -1,6 +1,7 @@
 import { CommandManager } from "./command-manager";
 import { Turtle } from "./turtle";
 
+
 let commandManager = new CommandManager();
 
 let commandHistory : string[] = [];

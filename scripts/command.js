@@ -16,10 +16,10 @@ define(["require", "exports"], function (require, exports) {
      */
     var Command = (function () {
         function Command() {
+            this.args = [];
         }
         Command.prototype.buildRegEx = function () {
             var strRegex = "^\\s*" + this.cmdName;
-            console.log(this.expectedArgs);
             for (var _i = 0, _a = this.expectedArgs; _i < _a.length; _i++) {
                 var arg = _a[_i];
                 if (arg.type == "number") {
@@ -43,7 +43,6 @@ define(["require", "exports"], function (require, exports) {
             if (!regex.test(command)) {
                 return false;
             }
-            console.log(regex);
             command = command.replace(this.cmdName, ""); //We take out the name of the command
             this.args = command.match(/#?\w+/g); //Update the array of arguments with the arguments retrieved from the command
             if (this.args != null) {
@@ -309,6 +308,7 @@ define(["require", "exports"], function (require, exports) {
         function REPETECmd() {
             var _this = _super.call(this) || this;
             _this.subcommands = [];
+            _this.subcommands = [];
             _this.cmdName = "REPETE";
             _this.expectedArgs = [
                 { name: "times", type: "number" },
@@ -326,8 +326,9 @@ define(["require", "exports"], function (require, exports) {
             for (var i = 1; i < this.args.length; i++) {
                 var arg = this.args[i];
                 var newCmd = false;
-                for (var _i = 0, cmdList_1 = exports.cmdList; _i < cmdList_1.length; _i++) {
-                    var cmd = cmdList_1[_i];
+                for (var _i = 0, cmdClasses_1 = exports.cmdClasses; _i < cmdClasses_1.length; _i++) {
+                    var cmdClass = cmdClasses_1[_i];
+                    var cmd = new cmdClass();
                     if (cmd.cmdName == arg) {
                         if (currentCmd != null) {
                             if (currentCmd.check(currentCmdStr)) {
@@ -339,7 +340,7 @@ define(["require", "exports"], function (require, exports) {
                                 return false;
                             }
                         }
-                        currentCmd = Object.create(cmd);
+                        currentCmd = cmd;
                         newCmd = true;
                         currentCmdStr = arg;
                         break;
@@ -359,6 +360,7 @@ define(["require", "exports"], function (require, exports) {
                     return false;
                 }
             }
+            console.log(this.subcommands);
             return true;
         };
         REPETECmd.prototype.check = function (command) {
@@ -401,10 +403,9 @@ define(["require", "exports"], function (require, exports) {
         return REPETECmd;
     }(Command));
     exports.REPETECmd = REPETECmd;
-    exports.cmdList = [
-        new AVCmd(), new RECmd(), new CTCmd(), new BCCmd(),
-        new FCCCmd(), new LCCmd(), new MTCmd(), new TDCmd(), new TGCmd(),
-        new VECmd(), new REPETECmd()
+    exports.cmdClasses = [
+        AVCmd, RECmd, CTCmd, BCCmd, FCCCmd, LCCmd, MTCmd, TDCmd, TGCmd,
+        VECmd, REPETECmd
     ];
 });
 //# sourceMappingURL=command.js.map

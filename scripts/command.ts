@@ -16,9 +16,13 @@ export abstract class Command{
     protected expectedArgs : CommandArgument[]; //Describe the expected arguments and their type
     protected args : any[]; //The actual arguments
 
+    constructor(){
+        this.args = [];
+    }
+
     protected buildRegEx() : RegExp {
         let strRegex = "^\\s*" + this.cmdName;
-        console.log(this.expectedArgs);
+
         for(let arg of this.expectedArgs){
             if(arg.type == "number"){
                 strRegex += "\\s*[0-9]+";
@@ -42,7 +46,7 @@ export abstract class Command{
         if(!regex.test(command)){
             return false;
         }
-        console.log(regex);
+        
         command = command.replace(this.cmdName, "");//We take out the name of the command
 
         this.args = command.match(/#?\w+/g); //Update the array of arguments with the arguments retrieved from the command
@@ -309,6 +313,7 @@ export class REPETECmd extends Command{
 
     constructor(){
         super();
+        this.subcommands = [];
         this.cmdName = "REPETE";
         this.expectedArgs = [
             { name : "times", type : "number" },
@@ -326,7 +331,8 @@ export class REPETECmd extends Command{
         for(let i = 1; i < this.args.length; i++){
             let arg = this.args[i];
             let newCmd = false;
-            for(let cmd of cmdList){
+            for(let cmdClass of cmdClasses){
+                let cmd = new cmdClass();
                 if(cmd.cmdName == arg)
                 {
                     if(currentCmd != null){
@@ -338,7 +344,7 @@ export class REPETECmd extends Command{
                             return false;
                         }
                     }
-                    currentCmd = Object.create(cmd);
+                    currentCmd = cmd;
                     newCmd = true;
                     currentCmdStr = arg;
                     break;
@@ -357,6 +363,7 @@ export class REPETECmd extends Command{
                 return false;
             }
         }
+        console.log(this.subcommands);
         return true;
     }
 
@@ -404,8 +411,7 @@ export class REPETECmd extends Command{
     }
 }
 
-export const cmdList : Command[] = [
-    new AVCmd(), new RECmd(), new CTCmd(), new BCCmd(), 
-    new FCCCmd(), new LCCmd(), new MTCmd(), new TDCmd(), new TGCmd(), 
-    new VECmd(), new REPETECmd()
+export const cmdClasses : any = [
+    AVCmd, RECmd, CTCmd, BCCmd, FCCCmd, LCCmd, MTCmd, TDCmd, TGCmd, 
+    VECmd, REPETECmd
 ];

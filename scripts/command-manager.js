@@ -12,10 +12,11 @@ define(["require", "exports", "./turtle", "./command"], function (require, expor
         CommandManager.prototype.executeCommand = function (cmd) {
             var cmdName = this.getCommandName(cmd);
             var cmdToExecute;
-            for (var _i = 0, cmdList_1 = command_1.cmdList; _i < cmdList_1.length; _i++) {
-                var command = cmdList_1[_i];
+            for (var _i = 0, cmdClasses_1 = command_1.cmdClasses; _i < cmdClasses_1.length; _i++) {
+                var cmdClass = cmdClasses_1[_i];
+                var command = new cmdClass();
                 if (cmdName == command.cmdName) {
-                    cmdToExecute = Object.create(command);
+                    cmdToExecute = command;
                 }
             }
             if (cmdToExecute != null) {
