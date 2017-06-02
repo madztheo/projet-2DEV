@@ -14,11 +14,7 @@ interface CommandArgument{
 export abstract class Command{
     public cmdName : string; //The name of the command
     protected expectedArgs : CommandArgument[]; //Describe the expected arguments and their type
-    protected args : any[]; //The actual arguments
-
-    constructor(){
-        this.args = [];
-    }
+    protected args : any[]; //The actual argument
 
     protected buildRegEx() : RegExp {
         let strRegex = "^\\s*" + this.cmdName;
@@ -313,7 +309,6 @@ export class REPETECmd extends Command{
 
     constructor(){
         super();
-        this.subcommands = [];
         this.cmdName = "REPETE";
         this.expectedArgs = [
             { name : "times", type : "number" },
@@ -340,6 +335,7 @@ export class REPETECmd extends Command{
                             this.subcommands.push({ 
                                 literalCmd : currentCmdStr, command : currentCmd
                             });
+                            currentCmd = null;
                         } else {
                             return false;
                         }
@@ -348,6 +344,8 @@ export class REPETECmd extends Command{
                     newCmd = true;
                     currentCmdStr = arg;
                     break;
+                } else if(currentCmd == null){
+                    return false;
                 }
             }
             if(!newCmd){

@@ -16,7 +16,6 @@ define(["require", "exports"], function (require, exports) {
      */
     var Command = (function () {
         function Command() {
-            this.args = [];
         }
         Command.prototype.buildRegEx = function () {
             var strRegex = "^\\s*" + this.cmdName;
@@ -308,7 +307,6 @@ define(["require", "exports"], function (require, exports) {
         function REPETECmd() {
             var _this = _super.call(this) || this;
             _this.subcommands = [];
-            _this.subcommands = [];
             _this.cmdName = "REPETE";
             _this.expectedArgs = [
                 { name: "times", type: "number" },
@@ -335,6 +333,7 @@ define(["require", "exports"], function (require, exports) {
                                 this.subcommands.push({
                                     literalCmd: currentCmdStr, command: currentCmd
                                 });
+                                currentCmd = null;
                             }
                             else {
                                 return false;
@@ -344,6 +343,9 @@ define(["require", "exports"], function (require, exports) {
                         newCmd = true;
                         currentCmdStr = arg;
                         break;
+                    }
+                    else if (currentCmd == null) {
+                        return false;
                     }
                 }
                 if (!newCmd) {
