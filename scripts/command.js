@@ -22,13 +22,13 @@ define(["require", "exports"], function (require, exports) {
             for (var _i = 0, _a = this.expectedArgs; _i < _a.length; _i++) {
                 var arg = _a[_i];
                 if (arg.type == "number") {
-                    strRegex += "\\s*[0-9]+";
+                    strRegex += "\\s+[0-9]+";
                 }
                 else if (arg.type == "hexadecimal") {
-                    strRegex += "\\s*#?[0-9A-Fa-f]+";
+                    strRegex += "\\s+#?[0-9A-Fa-f]+";
                 }
                 else {
-                    strRegex += "\\s*#?\\w+";
+                    strRegex += "\\s+#?\\w+";
                 }
             }
             return new RegExp(strRegex + "\\s*$");
@@ -316,7 +316,7 @@ define(["require", "exports"], function (require, exports) {
             return _this;
         }
         REPETECmd.prototype.buildRegEx = function () {
-            return /^\s*REPETE\s*[0-9]+\s*\[(#?(\w|\s))+\]\s*$/;
+            return /^\s*REPETE\s+[0-9]+\s+\[(#?(\w|\s))+\]\s*$/;
         };
         REPETECmd.prototype.getSubCommands = function () {
             var currentCmdStr = "";
