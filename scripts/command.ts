@@ -16,9 +16,9 @@ export abstract class Command{
     protected expectedArgs : CommandArgument[]; //Describe the expected arguments and their type
     protected args : any[]; //The actual argument
 
-    protected buildRegEx() : RegExp {
+    public buildRegEx() : RegExp {
         let strRegex = "^\\s*" + this.cmdName;
-
+        
         for(let arg of this.expectedArgs){
             if(arg.type == "number"){
                 strRegex += "\\s+[0-9]+";
@@ -316,8 +316,29 @@ export class REPETECmd extends Command{
         ];;
     }
 
-    protected buildRegEx() : RegExp {
+    public buildRegEx() : RegExp {
         return /^\s*REPETE\s+[0-9]+\s+\[(#?(\w|\s))+\]\s*$/;
+    }
+
+    /**
+     * Create a regex with the regex of the subcommands between brackets
+     * so that we can be sure that the syntax is correct
+     * @param {string} command The command to analyze
+     */
+    private testCommand(command : string) : boolean{
+        let regExStr = "^\\s*REPETE\\s+[0-9]+\\s+\\["
+        for(let i = 0; i < this.args.length - 1; i++){
+            for(let cmdClass of cmdClasses){
+                let cmd : Command = new cmdClass();
+                if(cmd.cmdName == this.args[i]){
+                    let subRegEx = cmd.buildRegEx().source.replace("^", "").replace("$", "");
+                    regExStr += subRegEx;    
+                }
+            }
+        }
+        regExStr +=  "\\]\\s*$";
+        let regex = new RegExp(regExStr);
+        return regex.test(command);
     }
 
     getSubCommands() : boolean {
@@ -344,8 +365,6 @@ export class REPETECmd extends Command{
                     newCmd = true;
                     currentCmdStr = arg;
                     break;
-                } else if(currentCmd == null){
-                    return false;
                 }
             }
             if(!newCmd){
@@ -361,27 +380,31 @@ export class REPETECmd extends Command{
                 return false;
             }
         }
-        console.log(this.subcommands);
         return true;
     }
 
     check(command: string) : boolean {
         const regex = this.buildRegEx();
 
+        //We first test if the global regex for the REPETE command is what we would expect
         if(!regex.test(command)){
             return false;
         }
 
-        command = command.replace(this.cmdName, "");//We take out the name of the command
+        this.args = command.replace(this.cmdName, "").match(/#?\w+/g); //Update the array of arguments with the arguments retrieved from the command (we take out the name first)
 
-        this.args = command.match(/#?\w+/g); //Update the array of arguments with the arguments retrieved from the command
-
+        //We then with the arguments gotten make sure that the syntax is correct
+        if(!this.testCommand(command)){
+            return false;
+        }
+        
         if(this.args != null){
             //Check if the arguments passed match with the expected arguments
             for(let i = 0; i < this.args.length; i++){
                 if(i < this.expectedArgs.length && this.expectedArgs[i].type == "number"){
                     let nb = parseInt(this.args[i]);
                     if(isNaN(nb)){
+                        console.log(false);
                         return false;
                     }
                     this.args[i] = nb;

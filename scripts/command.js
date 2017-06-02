@@ -318,14 +318,35 @@ define(["require", "exports"], function (require, exports) {
         REPETECmd.prototype.buildRegEx = function () {
             return /^\s*REPETE\s+[0-9]+\s+\[(#?(\w|\s))+\]\s*$/;
         };
+        /**
+         * Create a regex with the regex of the subcommands between brackets
+         * so that we can be sure that the syntax is correct
+         * @param {string} command The command to analyze
+         */
+        REPETECmd.prototype.testCommand = function (command) {
+            var regExStr = "^\\s*REPETE\\s+[0-9]+\\s+\\[";
+            for (var i = 0; i < this.args.length - 1; i++) {
+                for (var _i = 0, cmdClasses_1 = exports.cmdClasses; _i < cmdClasses_1.length; _i++) {
+                    var cmdClass = cmdClasses_1[_i];
+                    var cmd = new cmdClass();
+                    if (cmd.cmdName == this.args[i]) {
+                        var subRegEx = cmd.buildRegEx().source.replace("^", "").replace("$", "");
+                        regExStr += subRegEx;
+                    }
+                }
+            }
+            regExStr += "\\]\\s*$";
+            var regex = new RegExp(regExStr);
+            return regex.test(command);
+        };
         REPETECmd.prototype.getSubCommands = function () {
             var currentCmdStr = "";
             var currentCmd = null;
             for (var i = 1; i < this.args.length; i++) {
                 var arg = this.args[i];
                 var newCmd = false;
-                for (var _i = 0, cmdClasses_1 = exports.cmdClasses; _i < cmdClasses_1.length; _i++) {
-                    var cmdClass = cmdClasses_1[_i];
+                for (var _i = 0, cmdClasses_2 = exports.cmdClasses; _i < cmdClasses_2.length; _i++) {
+                    var cmdClass = cmdClasses_2[_i];
                     var cmd = new cmdClass();
                     if (cmd.cmdName == arg) {
                         if (currentCmd != null) {
@@ -344,9 +365,6 @@ define(["require", "exports"], function (require, exports) {
                         currentCmdStr = arg;
                         break;
                     }
-                    else if (currentCmd == null) {
-                        return false;
-                    }
                 }
                 if (!newCmd) {
                     currentCmdStr += " " + arg;
@@ -362,22 +380,26 @@ define(["require", "exports"], function (require, exports) {
                     return false;
                 }
             }
-            console.log(this.subcommands);
             return true;
         };
         REPETECmd.prototype.check = function (command) {
             var regex = this.buildRegEx();
+            //We first test if the global regex for the REPETE command is what we would expect
             if (!regex.test(command)) {
                 return false;
             }
-            command = command.replace(this.cmdName, ""); //We take out the name of the command
-            this.args = command.match(/#?\w+/g); //Update the array of arguments with the arguments retrieved from the command
+            this.args = command.replace(this.cmdName, "").match(/#?\w+/g); //Update the array of arguments with the arguments retrieved from the command (we take out the name first)
+            //We then with the arguments gotten make sure that the syntax is correct
+            if (!this.testCommand(command)) {
+                return false;
+            }
             if (this.args != null) {
                 //Check if the arguments passed match with the expected arguments
                 for (var i = 0; i < this.args.length; i++) {
                     if (i < this.expectedArgs.length && this.expectedArgs[i].type == "number") {
                         var nb = parseInt(this.args[i]);
                         if (isNaN(nb)) {
+                            console.log(false);
                             return false;
                         }
                         this.args[i] = nb;
