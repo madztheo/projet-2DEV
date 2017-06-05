@@ -1,0 +1,94 @@
+<head>
+    <meta charset="UTF-8">
+    <title>Documentation technique</title>
+    <link rel="stylesheet" href="https://bootswatch.com/lumen/bootstrap.min.css">
+    <style>
+        .container {
+            padding-left: 10%;
+            padding-right: 10%;
+            margin: 30px auto;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-size: 18px;
+        }
+
+        .bs-callout {
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #eee;
+            border-left-width: 5px;
+            border-radius: 3px
+        }
+
+        .bs-callout p:last-child {
+            margin-bottom: 0
+        }
+
+        .bs-callout code {
+            border-radius: 3px
+        }
+
+        .bs-callout+.bs-callout {
+            margin-top: -5px
+        }
+
+        .bs-callout-danger {
+            border-left-color: #ce4844
+        }
+
+        .bs-callout-danger span {
+            color: #ce4844
+        }
+
+        .bs-callout-info {
+            border-left-color: #1b809e
+        }
+
+        .bs-callout-info span {
+            color: #1b809e
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header clearfix">
+            <h3 class="text-muted">Documentation technique</h3>
+        </div>
+        <h3>La gestion des commandes et la grammaire</h3>
+        <p align="justify">
+            Afin de rendre la gestion des commandes plus générique (en offrant par exemple la possibilité d'en rajouter plus simplement), les commandes ont été regroupées sous forme de classes enfants, héritant chacune d’une classe parente commune. Cette dernière regroupe donc les bases du fonctionnement d’une commande LOGO avec une fonction de vérification de syntaxe et d’exécution, évitant ainsi une redondance dans les classes enfants.
+        </p>
+        <p align="justify">
+            La structure générique de la classe parente s'organise de la façon suivante:
+            <ul>
+                <li>Le nom de la commande enfant</li>
+                <li>Un tableau descriptif des arguments indiquant leur nom et type</li>
+                <li>Un tableau des valeurs passés à ces arguments</li>
+            </ul>
+            Ces données étant définies pour chaque commande, on peut donc automatiquement redéfinir le comportement de la fonction de vérification et d’exécution, et ce pour chaque commande.
+        </p>
+        <p align="justify">
+            Plusieurs étapes s’inscrivent par la suite dans la vérification de la commande. Tout d’abord, on génère l’expression régulière associée à la commande à l’aide de son nom et des types de paramètres attendus. Ensuite, cette expression régulière est utilisée pour détecter si la commande passée correspond bien à la syntaxe attendue ou non. Une fois cette étape passée, on extrait tous les paramètres de la commande à l’aide d’une expression régulière nous permettant de récupérer tous les mots de la commande un par un dans un tableau. Enfin, ce tableau est parcouru afin de convertir les éventuels nombres. Pour finir, si la commande s’est avérée correcte, elle passera la main au code à exécuter défini pour chaque commande.
+        </p>
+
+
+        <h3>La commande REPETE</h3>
+        <p align="justify">
+            La commande REPETE hérite comme les autres commandes de la classe Command, mais dispose dans sa syntaxe et dans son exécution d'une particularité qui a demandé de redéfinir son code de façon plus extensive.
+        </p>
+        <p align="justify">
+            Tout d’abord, à l’entrée on effectue deux vérifications au lieu d'une seule. On teste d’abord la commande entrée à l’aide d’une expression régulière « globale » qui s’occupe de s’assurer que la syntaxe en dehors des crochets de REPETE est correcte. On génère ensuite le tableau des paramètres passés sur le même modèle que les autres commandes. Puis on passe à la deuxième vérification qui consiste d’abord à générer une expression régulière dynamiquement à partir de la concaténation des expressions régulières de chacune des commandes à répéter entre crochets, puis on teste la commande avec cette expression régulière. Ainsi, on sûr de la syntaxe de la commande. On effectue ensuite les éventuelles conversions pour les nombres comme pour les autres commandes et on passe à la génération du tableau des sous-commandes.
+        </p>
+        <p align="justify">
+            La génération des sous-commandes s’effectue en parcourant chaque élément du tableau d’arguments de REPETE qui contiendra donc nos noms de commandes et leurs paramètres. À chaque fois qu’un nom de commande est reconnu (à l’aide de la liste de toutes les commandes) on instancie cette commande avec les paramètres qui suivent au fur et à mesure, puis lorsqu’une nouvelle commande est rencontrée, on ajoute la commande précédente avec ses paramètres au tableau des sous-commandes puis on passe à la nouvelle. Avant d’ajouter une commande au tableau on appelle toutefois sa fonction de vérification et qui, s’il s’avère qu’elle retourne faux, enclenchera l’invalidation de toute la commande REPETE. Une fois toutes ces vérifications et opérations effectuées, on boucle sur notre tableau de sous commandes et on les exécute une par une, et ce le nombre de fois passée en paramètre à la fonction REPETE, avec un délai entre chacune afin de montrer l’avancement étape par étape.
+        </p>
+
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+</body>
